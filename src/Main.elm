@@ -5,6 +5,7 @@ import Html exposing (program, Html, text, div, button)
 import Html.Attributes exposing (class, classList)
 import Html.Events exposing (onClick)
 import Data.ZipW as Z exposing (ZipW)
+import Data.ZipW2d as Z2 exposing (ZipW2d)
 import GoL.One as G1
 
 
@@ -23,11 +24,30 @@ view model =
         [ div
             [ class "ctrl-panel" ]
             [ btnRow model.playing
+            , dimensionView model.pattern
             ]
         , div
             [ class "gol-container" ]
             [ golView model.pattern ]
         ]
+
+
+dimensionView : Pattern Bool -> Html Msg
+dimensionView pattern =
+    case pattern of
+        One _ ->
+            div
+                [ class "dimension"
+                , onClick Dimension
+                ]
+                [ text "...to the 2nd Dimension" ]
+
+        Two _ ->
+            div
+                [ classList [ ( "dimension", True ), ( "select-2d", True ) ]
+                , onClick Dimension
+                ]
+                [ text "...to the 1st Dimension" ]
 
 
 btnRow : Bool -> Html Msg
@@ -59,8 +79,13 @@ cellView b =
 
 
 golView : Pattern Bool -> Html Msg
-golView (One p) =
-    div [ class "container-1d" ] <| Z.toList <| Z.map cellView p.seq
+golView pattern =
+    case pattern of
+        One p ->
+            div [ class "container-1d" ] <| Z.toList <| Z.map cellView p.seq
+
+        Two p ->
+            div [ class "container-2d" ] <| Z2.toList <| Z2.map cellView p.seq
 
 
 main : Program Never Model Msg
